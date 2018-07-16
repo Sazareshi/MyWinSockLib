@@ -1,0 +1,2 @@
+# MyWinSockLib
+My socket library
