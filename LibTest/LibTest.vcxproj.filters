@@ -33,6 +33,15 @@
     <ClInclude Include="ThreadObj.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Communicator.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="MCtransaction.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -45,6 +54,15 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="ThreadObj.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Communicator.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="MCtransaction.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -61,6 +79,9 @@
       <Filter>リソース ファイル</Filter>
     </Image>
     <Image Include="bmp\yu.bmp">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="bmp\comm.bmp">
       <Filter>リソース ファイル</Filter>
     </Image>
   </ItemGroup>
