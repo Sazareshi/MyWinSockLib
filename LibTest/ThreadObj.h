@@ -86,7 +86,7 @@ public:
 	CThreadObj();
 	virtual ~CThreadObj();//デストラクタ
 
-	virtual void init_task() { return; };
+	virtual void init_task(void* pobj) { return; };
 	unsigned __stdcall run(void *param);//スレッド実行対象関数
 
 	//スレッド実行対象関数内で呼ばれる処理 run()内でいずれかが選択実施される

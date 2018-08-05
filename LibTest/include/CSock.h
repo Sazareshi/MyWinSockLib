@@ -55,7 +55,7 @@ public:
 	static StSOCKPACKAGE sock_packs[SOCKET_MAX_NUM];
 	static StSOCKERR sock_err[SOCKET_MAX_NUM];
 	static StRCVBUFPACK rcvbufpack[SOCKET_MAX_NUM];
-	static WSAEVENT hEvents[SOCKET_MAX_NUM];
+	static WSAEVENT hEvents[SOCKET_MAX_NUM+1];
 	static BOOL init_ok;
 
 public:

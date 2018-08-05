@@ -6,13 +6,29 @@
 #define MC_TRANSACTION_MAX 16
 
 #define MC_STP_IDLE		0
-#define MC_STP_WAIT_RES 1
-#define MC_STP_END		2
+#define MC_STP_START	1
+#define MC_STP_WAIT_RES 2
+
 
 #define MC_TYP_READ_D	1
 #define MC_TYP_READ_R	2
 #define MC_TYP_WRITE_D	4
 #define MC_TYP_WRITE_R	8
+
+#define MC_SOCK_NOT_REGISTERED -1
+#define MC_SOCK_USE	 1
+
+#define COMPOS_READ_D100	0
+#define COMPOS_WRITE_D110	1
+#define COMPOS_READ_R0_R303	2
+#define COMPOS_READ_R304__	3
+
+#define SIZE_OF_FAULT_TRIGGER	304
+#define SIZE_OF_TRACE_RECORD	96
+
+#define NEW_TRANZACTION_READY	1
+#define NEW_TRANZACTION_BUSY	0
+
 
 //共通ヘッダ
 typedef struct _stMCCommonHeader
@@ -99,22 +115,27 @@ typedef struct _stMCResData
 
 typedef struct _stMCTransactionMng
 {
-	int nCommand;
-	int pregress;// -1:idle, 0:start taransaction, 1-nComm: num of complete
-	int step[MC_TRANSACTION_MAX];
+	int nCommandSet;//セットされているコマンド数
+	int com_step[MC_TRANSACTION_MAX];
 	int com_msg_len[MC_TRANSACTION_MAX];
-	MCCMD com_msg[MC_TRANSACTION_MAX];
-	MCRES res_msg[MC_TRANSACTION_MAX];
+	MCCMD com_msg[MC_TRANSACTION_MAX];//コマンド電文
+ 	MCRES res_msg[MC_TRANSACTION_MAX];//レスポンス電文
+
+	HANDLE hsock_event;
+	int sock_index;//CSockfより割り当てられたソケットのインデックス
+	USHORT sock_port;//利用するソケットのポート
+	PCSTR  sock_ipaddr;//利用するソケットのIPアドレス
+	WORD   sock_event_status;
 }MCMsgMng, LPMCMsgMng;
 
 class CMCtransaction
 {
 public:
-	int n_act;									//活動中のトランザクション数
-	MCComHeader	mc_header;						//MCプロトコル共通ヘッダ
-	MCMsgMng mcifmng;
-	int req_transaction(int nCommand);			//トランザクション要求
+	MCMsgMng mcifmng;//MCプロトコル処理管理構造体
+	int req_transaction(int nCommand);	//トランザクション要求
 	int set_com_msg(int pos, int type, int writelen, ...);//コマンドメッセージセット
+	int init();	//初期化
+	int Is_tranzaction_ready();	//コマンド送信可否判定
 
 public:
 	CMCtransaction();

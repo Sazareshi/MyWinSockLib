@@ -73,6 +73,5 @@ public:
 	static HRESULT GetSockMsg(int nError, LPWSTR pszMessage, DWORD dwSize);
 	static int msg_pickup(int index, const char* buf, int n);
 	static int rcv_check(int index);
-	static void req_restart(int index);
 };
 

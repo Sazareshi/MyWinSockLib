@@ -17,10 +17,15 @@ int CSock::wsa_init() {
 
 	WSADATA wsaData;
 
+	HANDLE hDefEvent = CreateEvent(NULL, FALSE, FALSE, NULL);//セキュリティ,自動リセット,初期シグナル状態,名前文字列
+
 	for (int i = 0; i < SOCKET_MAX_NUM; i++) {
 		sock_packs[i].current_step = NULL;
 		sock_packs[i].socket = INVALID_SOCKET;
+		// defaultイベントハンドルでhEvent配列初期化
+		hEvents[i] = hDefEvent;
 	}
+	hEvents[SOCKET_MAX_NUM] = hDefEvent;
 
 	//WinSock.dllを初期化する
 	if (int nRet = WSAStartup(WINSOCK_VERSION, &wsaData)) {
@@ -90,6 +95,7 @@ int CSock::create(int * index, IN_ADDR ip_addr, USHORT port, int protocol, int t
 		WSACloseEvent(hEvents[si]);
 		sock_packs[si].socket = INVALID_SOCKET;
 		sock_packs[si].current_step = SOCK_NOT_CREATED;
+		hEvents[si] = hEvents[SOCKET_MAX_NUM];
 		return SOCK_ERROR;
 	}
 
@@ -115,6 +121,7 @@ HRESULT CSock::make_connection(int index) {
 					WSACloseEvent(hEvents[index]);
 					sock_packs[index].socket = INVALID_SOCKET;
 					sock_packs[index].current_step = SOCK_NOT_CREATED;
+					hEvents[index] = hEvents[SOCKET_MAX_NUM];
 					return sock_err[index].wErrCode;
 				}
 			}
@@ -172,14 +179,13 @@ int CSock::sock_close(int index) {
 	if(sock_packs[index].socket != INVALID_SOCKET) closesocket(sock_packs[index].socket);
 	sock_packs[index].current_step = SOCK_NOT_CREATED;
 	sock_packs[index].socket = INVALID_SOCKET;
+	WSACloseEvent(hEvents[index]);
 	return S_OK;
 }
 
 int CSock::exit(){
-	for (int i = 0; i < SOCKET_MAX_NUM; i++) {
-		sock_packs[i].current_step = NULL;
-		sock_packs[i].socket = INVALID_SOCKET;
-	}
+	for (int i = 0; i < SOCKET_MAX_NUM; i++) sock_close(i);
+	init_ok = FALSE;
 	return WSACleanup();
 }
 
@@ -190,11 +196,6 @@ int CSock::rcv_check(int index) {
 	else return rcvbufpack[index].wptr + 1 + (NUM_OF_RBUF - rcvbufpack[index].rptr);
 };
 
-void CSock::req_restart(int index) {
-	closesocket(sock_packs[index].socket);
-	sock_packs[index].socket = INVALID_SOCKET;
-	sock_packs[index].current_step = SOCK_NOT_CREATED;
-};
 
 HRESULT CSock::GetSockMsg(int nError, LPWSTR pszMessage, DWORD dwSize)
 {
