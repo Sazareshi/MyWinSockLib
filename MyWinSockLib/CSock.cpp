@@ -71,6 +71,8 @@ int CSock::create(int * index, IN_ADDR ip_addr, USHORT port, int protocol, int t
 		sock_packs[si].current_step = SOCK_NOT_CREATED;
 		return SOCK_ERROR;
 	}
+	sock_packs[si].sock_protocol = protocol;
+	sock_packs[si].sock_type = type;
 
 	//ソケットで使用するイベントオブジェクトを作成する
 	hEvents[si] = WSACreateEvent();
@@ -146,9 +148,9 @@ int CSock::sock_connected(int index) {
 
 int CSock::sock_send(int index, const char* buf, int length) {
 	int nRet;
-	if(sock_packs[index].sock_type == SOCK_STREAM)
+	if(sock_packs[index].sock_protocol == SOCK_STREAM)
 		nRet = send(sock_packs[index].socket, buf, length, 0);
-	else if (sock_packs[index].sock_type == SOCK_DGRAM) {
+	else if (sock_packs[index].sock_protocol == SOCK_DGRAM) {
 		;
 	}
 	else return APP_ERROR;
@@ -158,14 +160,14 @@ int CSock::sock_send(int index, const char* buf, int length) {
 
 int CSock::sock_recv(int index) {
 	int nRet;
-	if (sock_packs[index].sock_type == SOCK_STREAM) {
+	if (sock_packs[index].sock_protocol == SOCK_STREAM) {
 		if (nRet = recv(sock_packs[index].socket, rcvbufpack[index].rbuf[rcvbufpack[index].wptr], SIZE_OF_RBUF, 0)) {
 			rcvbufpack[index].datsize[rcvbufpack[index].wptr] = nRet;
 			rcvbufpack[index].wptr++;
 			if (rcvbufpack[index].wptr >= NUM_OF_RBUF) rcvbufpack[index].wptr = 0;
 		}
 	}
-	else if (sock_packs[index].sock_type == SOCK_DGRAM) {
+	else if (sock_packs[index].sock_protocol == SOCK_DGRAM) {
 		;
 	}
 	else return APP_ERROR;

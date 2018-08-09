@@ -44,6 +44,7 @@ typedef struct _stRcvBufPack
 typedef struct _stSockPack
 {
 	int sock_type;//CLIENT_SOCKET or SERVER_SOCKET
+	int sock_protocol;//CLIENT_SOCKET or SERVER_SOCKET
 	int current_step;
 	SOCKET socket;
 	SOCKADDR_IN sa;

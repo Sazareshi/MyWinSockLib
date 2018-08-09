@@ -44,6 +44,7 @@ typedef struct _stRcvBufPack
 typedef struct _stSockPack
 {
 	int sock_type;//CLIENT_SOCKET or SERVER_SOCKET
+	int sock_protocol;//CLIENT_SOCKET or SERVER_SOCKET
 	int current_step;
 	SOCKET socket;
 	SOCKADDR_IN sa;
@@ -55,7 +56,7 @@ public:
 	static StSOCKPACKAGE sock_packs[SOCKET_MAX_NUM];
 	static StSOCKERR sock_err[SOCKET_MAX_NUM];
 	static StRCVBUFPACK rcvbufpack[SOCKET_MAX_NUM];
-	static WSAEVENT hEvents[SOCKET_MAX_NUM+1];
+	static WSAEVENT hEvents[SOCKET_MAX_NUM];
 	static BOOL init_ok;
 
 public:
@@ -73,6 +74,5 @@ public:
 	static HRESULT GetSockMsg(int nError, LPWSTR pszMessage, DWORD dwSize);
 	static int msg_pickup(int index, const char* buf, int n);
 	static int rcv_check(int index);
-	static void req_restart(int index);
 };
 

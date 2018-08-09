@@ -26,8 +26,10 @@
 #define SIZE_OF_FAULT_TRIGGER	304
 #define SIZE_OF_TRACE_RECORD	96
 
-#define NEW_TRANZACTION_READY	1
-#define NEW_TRANZACTION_BUSY	0
+#define TRANZACTION_READY	0
+#define TRANZACTION_BUSY	-1
+#define TRANZACTION_ERROR	-2
+
 
 
 //共通ヘッダ
@@ -125,7 +127,12 @@ typedef struct _stMCTransactionMng
 	int sock_index;//CSockfより割り当てられたソケットのインデックス
 	USHORT sock_port;//利用するソケットのポート
 	PCSTR  sock_ipaddr;//利用するソケットのIPアドレス
-	WORD   sock_event_status;
+	WORD   sock_event_status;//ソケットの状態
+
+	int seq_no;//トランザクションのシーケンス番号
+	int active_com;//実行中のコマンド電文
+	HWND hwnd;//トランザクションの完了通知先ウィンドウ
+
 }MCMsgMng, LPMCMsgMng;
 
 class CMCtransaction

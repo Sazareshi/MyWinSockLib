@@ -16,7 +16,7 @@ public:
 	~CCommunicator();
 	void routine_work(void *param);
 	static unsigned __stdcall MCprotoThread(void *pVoid);
-	unsigned start_MCsock(PCSTR ipaddr, USHORT port);
+	unsigned start_MCsock(PCSTR ipaddr, USHORT port, int protocol, int type);
 	void init_task(void* pobj);
 
 private:

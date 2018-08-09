@@ -6,16 +6,10 @@ CMCtransaction::CMCtransaction(){}
 
 CMCtransaction::~CMCtransaction(){}
 
-//トランザクション要求
-int CMCtransaction::req_transaction(int nCommand) {
-	return 1;
-}
 
 int CMCtransaction::set_com_msg(int pos, int type, int writelen, ...)//書き込むレジスタのバイト数
 {
 	va_list arguments;
-	
-
 	
 	//共通ヘッダ
 	mcifmng.com_msg[pos].cmd0401.common_header.subheader[0] = 0x50;//サブヘッダ
@@ -117,9 +111,29 @@ int CMCtransaction::init() {
 int CMCtransaction::Is_tranzaction_ready() {
 
 	for (int i = 0; i < mcifmng.nCommandSet; i++) 
-		if(mcifmng.com_step[i] != MC_STP_IDLE) return NEW_TRANZACTION_BUSY;
+		if(mcifmng.com_step[i] != MC_STP_IDLE) return TRANZACTION_BUSY;
 
-	return NEW_TRANZACTION_READY;
+	return TRANZACTION_READY;
 };
 ;	//コマンド送信可否判定
+
+	//トランザクション要求受付
+int CMCtransaction::req_transaction(int nCommand) {
+	CSock sock_handler;
+	int stat;
+
+	if (stat = Is_tranzaction_ready()) return stat;//他トランザクション実行中
+
+	if (mcifmng.sock_event_status & FD_WRITE) {
+		mcifmng.com_step[nCommand] = MC_STP_START;
+		if (mcifmng.com_msg_len[nCommand] != sock_handler.sock_send(mcifmng.sock_index, (const char*)(&(mcifmng.com_msg[nCommand].cmd0401)), mcifmng.com_msg_len[nCommand]) ){
+			stat = TRANZACTION_ERROR;
+			mcifmng.com_step[nCommand] = MC_STP_IDLE;
+			return TRANZACTION_ERROR;
+		}
+		mcifmng.com_step[nCommand] = MC_STP_WAIT_RES;
+	}
+
+	return stat = TRANZACTION_READY;
+}
 
