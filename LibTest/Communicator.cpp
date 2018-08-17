@@ -45,10 +45,21 @@ unsigned __stdcall CCommunicator::MCprotoThread(void *pVoid)
 			}
 			if (events.lNetworkEvents & FD_CONNECT) {
 				errCode = events.iErrorCode[FD_CONNECT_BIT];
-				sock_handler.sock_connected(isock);
-				pMCMsgMng->sock_event_status |= FD_CONNECT;
+				if(errCode == 0){
+					sock_handler.sock_connected(isock);
+					pMCMsgMng->sock_event_status |= FD_CONNECT;
+					ws << L"index:" << isock << L"  Connection OK"; pcomm->tweet2owner(ws.str()); ws.str(L""); ws.clear();
+				}
+				else {
+					pMCMsgMng->sock_event_status &= ~FD_CONNECT;
+					ws << L"index:" << isock << L"  Connection ERROR iErrorCode  " << errCode; pcomm->tweet2owner(ws.str()); //ws.str(L""); ws.clear();
+					int r = sock_handler.make_connection(pMCMsgMng->sock_index);
+					if (r == S_OK || r == WSAEWOULDBLOCK) {
+						ws << L"   Retry and Waiting Connection again"; pcomm->tweet2owner(ws.str()); ws.str(L""); ws.clear();
+						sock_handler.sock_packs[pMCMsgMng->sock_index].current_step = WAIT_CONNECTION;
+					}
+				}
 
-				ws << L"index:" << isock << L"  Connection OK"; pcomm->tweet2owner(ws.str()); ws.str(L""); ws.clear();
 			}
 			if (events.lNetworkEvents & FD_READ) {
 				errCode = events.iErrorCode[FD_READ_BIT];
